@@ -6,7 +6,7 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/spec-CC_BY_4.0-blue?style=flat-square)](LICENSE-CC-BY-4.0)
 [![License: MIT](https://img.shields.io/badge/code-MIT-green?style=flat-square)](LICENSE-MIT)
-[![Status: v0.1-draft](https://img.shields.io/badge/status-v0.1--draft-F59E0B?style=flat-square)](SPEC.md)
+[![Status: v1.0](https://img.shields.io/badge/status-v1.0-0F766E?style=flat-square)](SPEC.md)
 [![Companion: PDS](https://img.shields.io/badge/companion-PDS-7C3AED?style=flat-square)](https://github.com/drewmattie-code/Progressive-Discovery-Spine)
 
 </div>
@@ -157,6 +157,8 @@ ACS is not a novel invention. It's a formalization of a pattern that production 
 
 **Letta (formerly MemGPT) — Stateful Agents.** Letta operationalizes shared persistent state across agents: *"Memory blocks can be attached to multiple agents at once (\"shared blocks\")."* The same file-system-state insight, rendered as a memory primitive. [Source](https://docs.letta.com/guides/agents/memory/)
 
+**ECC (Everything Claude Code) — harness-native operator system.** Anthropic-hackathon-winning open-source project (~182K stars, 28K forks as of 2026-05) that documents the role-decomposed-subagent pattern as canonical practice: *"Subagents are processes your orchestrator (main Claude) can delegate tasks to with limited scopes."* The project ships a reference subagent set (planner, architect, tdd-guide, code-reviewer, security-reviewer, build-error-resolver, e2e-runner, refactor-cleaner) with scoped tool permissions per subagent — independent industry confirmation of ACS principle #1 (role-decomposed agents) and principle #7 (handoffs as first-class primitives). [Source](https://github.com/affaan-m/ECC)
+
 ### What ACS contributes
 
 The sources above document INDIVIDUAL implementations and isolated principles. ACS contributes:
@@ -168,7 +170,7 @@ The sources above document INDIVIDUAL implementations and isolated principles. A
 5. A **portable, citable specification** under CC BY 4.0 — adopt, adapt, build commercial products on top, with attribution
 6. **Explicit composition with PDS** — when both apply, the layering is unambiguous
 
-If your team is independently converging on this pattern (as Anthropic, Moonshot, Microsoft, LangChain, Cognition, OpenAI, and Letta already have), ACS gives you a vocabulary, a checklist, and a published artifact you can hand to your peers.
+If your team is independently converging on this pattern (as Anthropic, Moonshot, Microsoft, LangChain, Cognition, OpenAI, Letta, and the ECC open-source project already have), ACS gives you a vocabulary, a checklist, and a published artifact you can hand to your peers.
 
 ## What good looks like (target SLAs)
 
