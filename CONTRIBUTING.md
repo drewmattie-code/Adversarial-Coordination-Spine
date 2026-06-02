@@ -6,7 +6,7 @@ ACS is a **pattern specification**, not a software library. Contributions are mo
 
 ## 1. Implementation reports
 
-If you have built a multi-agent system that implements ACS (or pieces of it) in production, an issue or PR describing what worked, what didn't, and what you'd refine is the highest-value contribution. Anonymized is fine — patterns and surprises matter more than vendor names.
+If you have built a multi-agent system that implements ACS (or pieces of it) in production, an issue or PR describing what worked, what didn't, and what you'd refine is the highest-value contribution. Anonymized is fine. Patterns and surprises matter more than vendor names.
 
 Template: open an issue with title `[Implementation] <one-line summary>` and include:
 
@@ -14,11 +14,11 @@ Template: open an issue with title `[Implementation] <one-line summary>` and inc
 - Which of the 10 principles you implemented and which you skipped, and why
 - What broke and how you fixed it
 - What SLAs you measured against the targets in [SPEC.md](SPEC.md#4-slas-and-success-metrics)
-- Particularly valued: failure-mode reports — which of the four named failure modes did you hit, and what was the fix?
+- Particularly valued: failure-mode reports, i.e. which of the four named failure modes did you hit, and what was the fix?
 
 ## 2. Pattern refinements and additions
 
-If you find a missing principle, an unhandled failure mode, or a refinement to an existing principle, open an issue first to discuss before sending a PR. The spec is intentionally tight — every principle has earned its place. New principles need to be load-bearing, not nice-to-have.
+If you find a missing principle, an unhandled failure mode, or a refinement to an existing principle, open an issue first to discuss before sending a PR. The spec is intentionally tight. Every principle has earned its place. New principles need to be load-bearing, not nice-to-have.
 
 Refinements to existing principles are easier: open a PR with the proposed change to [SPEC.md](SPEC.md) and a one-paragraph rationale. Cite implementations or production incidents where possible.
 
@@ -36,8 +36,8 @@ Keep examples small and concrete. The point is to show the shape; production-gra
 
 ## What we won't accept
 
-- Vendor advertising — examples that exist primarily to promote a product. Keep examples vendor-neutral; if you need to name a framework, use it as one of many examples.
-- Speculative principles — additions without an implementation that supports them.
+- Vendor advertising: examples that exist primarily to promote a product. Keep examples vendor-neutral; if you need to name a framework, use it as one of many examples.
+- Speculative principles: additions without an implementation that supports them.
 - Cosmetic edits without rationale.
 
 ## Style
@@ -57,7 +57,7 @@ If you think a principle is wrong, please say so directly in an issue. Include t
 
 ## Relationship to PDS
 
-ACS is the companion specification to the [Progressive Discovery Spine (PDS)](https://github.com/drewmattie-code/Progressive-Discovery-Spine). PDS scopes the tool surface of one agent. ACS coordinates many agents against that surface. The two can be used together or separately. Cross-cutting contributions that touch both specs are welcome — open an issue on the more-affected repo first.
+ACS is the companion specification to the [Progressive Discovery Spine (PDS)](https://github.com/drewmattie-code/Progressive-Discovery-Spine). PDS scopes the tool surface of one agent. ACS coordinates many agents against that surface. The two can be used together or separately. Cross-cutting contributions that touch both specs are welcome. Open an issue on the more-affected repo first.
 
 ## Contact
 

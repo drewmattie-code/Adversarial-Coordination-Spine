@@ -1,6 +1,6 @@
 # Example: Evaluator rubric (full-stack app)
 
-A sample 26-criteria rubric for a generic full-stack web app. The Evaluator agent grades against this rubric (or one negotiated per sprint via `contract.md`). The point is granularity — vague criteria produce vague critiques, which produce no actionable fixes (ACS principle #3).
+A sample 26-criteria rubric for a generic full-stack web app. The Evaluator agent grades against this rubric (or one negotiated per sprint via `contract.md`). The point is granularity: vague criteria produce vague critiques, which produce no actionable fixes (ACS principle #3).
 
 The rubric is broken into four weighted dimensions, following Anthropic's pattern from the AI Engineer talk. Weights are tunable per domain. Defaults assume the model is already pretty good at functionality (true for Opus 4.6-class models), so weight skews toward design and originality where models are weaker.
 
@@ -26,9 +26,9 @@ The rubric is broken into four weighted dimensions, following Anthropic's patter
 3. **Color palette is constrained.** Max 5 hues in the page (excluding image content). Generic rainbow palettes fail.
 4. **Whitespace is generous, not nervous.** Comfortable air around primary content. Cramped pages fail.
 5. **Layout has a focal point.** A first-glance test: where does the eye go? If the answer is "nowhere," reject.
-6. **Interactive elements signal their state.** Hover, focus, active, disabled — all visibly distinct.
-7. **Empty states are designed.** Not just "No items" gray text — actual designed empty states.
-8. **Loading states exist.** Not just spinners — skeleton screens or progressive content reveal.
+6. **Interactive elements signal their state.** Hover, focus, active, disabled, all visibly distinct.
+7. **Empty states are designed.** Not just "No items" gray text, but actual designed empty states.
+8. **Loading states exist.** Not just spinners, but skeleton screens or progressive content reveal.
 9. **Error states are humane.** Plain-language errors, not stack traces or codes.
 
 ### Originality (5 items · 25% weight)
@@ -42,7 +42,7 @@ The rubric is broken into four weighted dimensions, following Anthropic's patter
 ### Craft (6 items · 20% weight)
 
 15. **Alignment is exact.** No off-by-one-pixel rows of elements. Items in a list align on edges.
-16. **Spacing is consistent.** 4 / 8 / 12 / 16 / 24 / 32 px scale — not random whatever-Tailwind-snapped-to.
+16. **Spacing is consistent.** 4 / 8 / 12 / 16 / 24 / 32 px scale, not random whatever-Tailwind-snapped-to.
 17. **Hover transitions exist.** Buttons and links animate (subtly) on hover.
 18. **Focus rings are present and visible.** Tab-navigable; visible focus indicator on every interactive element.
 19. **No console errors on load or interaction.** Open devtools, do the user flow, watch console. Any error = reject.
@@ -53,7 +53,7 @@ The rubric is broken into four weighted dimensions, following Anthropic's patter
 21. **Primary user flow works end-to-end.** Without intervention.
 22. **Test cases from the negotiated contract pass.** All of them. Not "mostly."
 23. **No fake features.** Buttons that look implemented but have no backend pass = reject. Half-baked features fail (Anthropic specifically flags this).
-24. **State persists where it should.** Refresh, navigate away and back — appropriate state survives.
+24. **State persists where it should.** Refresh, navigate away and back. Appropriate state survives.
 25. **Edge cases handled.** Empty input, very long input, special characters, network failure. At least three edge cases verified.
 26. **Performance is acceptable.** Page Time-to-Interactive < 3s on a moderate connection. Interactive elements respond < 100ms.
 
@@ -63,8 +63,8 @@ The rubric is broken into four weighted dimensions, following Anthropic's patter
 
 For each criterion, the Evaluator records:
 - **PASS** (1.0)
-- **PARTIAL** (0.5) — with a specific note on what's missing
-- **FAIL** (0.0) — with a specific note on what's wrong
+- **PARTIAL** (0.5), with a specific note on what's missing
+- **FAIL** (0.0), with a specific note on what's wrong
 
 Weighted score = `Σ(criterion_score × dimension_weight / criteria_in_dimension)`
 
@@ -72,7 +72,7 @@ Weighted score = `Σ(criterion_score × dimension_weight / criteria_in_dimension
 **First-pass rejection target:** rejection rate > 30% over the first 10 runs.
 
 If the Evaluator is rubber-stamping (first-pass acceptance > 70%), the
-prompt needs harsher calibration — add more "AI slop" example screenshots
+prompt needs harsher calibration: add more "AI slop" example screenshots
 to the system prompt, increase the weight on Design and Originality, or
 tighten the partial-credit definition.
 

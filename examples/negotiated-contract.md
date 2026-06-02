@@ -1,13 +1,13 @@
 # Example: Negotiated contract on disk
 
-This is what a `workspace/contract.md` file looks like in practice — the load-bearing artifact for ACS principle #3 (negotiated contracts, not handed-down specs).
+This is what a `workspace/contract.md` file looks like in practice: the load-bearing artifact for ACS principle #3 (negotiated contracts, not handed-down specs).
 
 The example shows one full negotiation for a single sprint, with three rounds of back-and-forth before the contract seals.
 
 ---
 
 ```markdown
-# Contract — Sprint 2: Sprite Editor
+# Contract - Sprint 2: Sprite Editor
 
 **Sprint ID:** sprint-2
 **Generator session:** gen-2026-05-25-12:00:00
@@ -16,7 +16,7 @@ The example shows one full negotiation for a single sprint, with three rounds of
 
 ---
 
-## Round 1 — Generator proposal (2026-05-25T12:00:14Z)
+## Round 1 - Generator proposal (2026-05-25T12:00:14Z)
 
 ### Scope
 I will build a 32×32 pixel sprite editor as a single HTML page. It includes:
@@ -40,9 +40,9 @@ I will build a 32×32 pixel sprite editor as a single HTML page. It includes:
 
 ---
 
-## Round 1 — Evaluator response (2026-05-25T12:03:09Z)
+## Round 1 - Evaluator response (2026-05-25T12:03:09Z)
 
-**REJECT — see below**
+**REJECT - see below**
 
 ### On scope
 Too narrow. A "sprite editor" without undo, animation frames, or zoom is
@@ -50,10 +50,10 @@ not a sprite editor; it's a paint canvas. Either rename the sprint or
 expand the scope.
 
 ### On testable assertions
-- "Page loads in < 500ms" — fine, measurable
-- "Clicking a palette color changes the active color" — needs assertion
+- "Page loads in < 500ms" - fine, measurable
+- "Clicking a palette color changes the active color" - needs assertion
   about the visual indication of active color
-- "Save button downloads a 32×32 PNG file" — needs a *round-trip* test:
+- "Save button downloads a 32×32 PNG file" - needs a *round-trip* test:
   save, reload the PNG, assert pixel equality with the canvas state
 
 ### On criteria (5 items)
@@ -68,7 +68,7 @@ Expand to ≥ 20 criteria. Include:
 
 ---
 
-## Round 2 — Generator counter-proposal (2026-05-25T12:09:37Z)
+## Round 2 - Generator counter-proposal (2026-05-25T12:09:37Z)
 
 ### Revised scope
 Building a 32×32 pixel sprite editor with:
@@ -86,18 +86,18 @@ Negotiable.
 1. Page loads in < 500ms
 2. Canvas renders a visible 32×32 grid
 3. Palette renders all 54 colors
-4. Click palette swatch — that swatch shows active border
-5. Click on canvas — pixel paints in active color
-6. Drag across canvas — line of pixels paints
+4. Click palette swatch - that swatch shows active border
+5. Click on canvas - pixel paints in active color
+6. Drag across canvas - line of pixels paints
 7. Ctrl+Z undoes last paint action
 8. Ctrl+Shift+Z redoes
 9. Zoom button cycles 1x → 4x → 8x → 1x
 10. Save button downloads `.png` file
 11. Round-trip: save → reload → canvas state equal at pixel level
-12. Page refresh — canvas state restored from localStorage
+12. Page refresh - canvas state restored from localStorage
 
 ### Criteria (24 items)
-[functional — 12 from above]
+[functional - 12 from above]
 13. Canvas is visible without horizontal scroll on 1280×800
 14. Palette swatches are ≥ 24px tap target (touch-friendly)
 15. Selected swatch shows ≥ 3px highlighted border
@@ -117,7 +117,7 @@ single-frame editor first. If you reject the deferral, propose alternative.
 
 ---
 
-## Round 2 — Evaluator response (2026-05-25T12:13:21Z)
+## Round 2 - Evaluator response (2026-05-25T12:13:21Z)
 
 ### On scope
 Accepted with one addition: include a "Clear canvas" button (criteria 25).
@@ -127,10 +127,10 @@ Otherwise good.
 Accepted. Logical sprint boundary.
 
 ### On testable assertions
-12 items — adequate. Round-trip test is now there. Good.
+12 items - adequate. Round-trip test is now there. Good.
 
 ### On criteria
-24 — meets the ≥ 20 floor. Add #25: "Clear canvas" button with
+24 - meets the ≥ 20 floor. Add #25: "Clear canvas" button with
 confirmation. Add #26: "Undo after clear" restores cleared state (test
 the undo stack survives clear).
 
@@ -143,7 +143,7 @@ text displayed in top-right corner, format `1x`/`4x`/`8x`."
 
 ---
 
-## Round 3 — Generator accept (2026-05-25T12:18:05Z)
+## Round 3 - Generator accept (2026-05-25T12:18:05Z)
 
 Accepting all three:
 - #25: Clear canvas button with confirmation
@@ -156,7 +156,7 @@ Final criterion count: 26.
 
 ---
 
-## Round 3 — Evaluator accept (2026-05-25T12:18:42Z)
+## Round 3 - Evaluator accept (2026-05-25T12:18:42Z)
 
 **Evaluator-side seal:** Contract accepted. Begin build.
 
