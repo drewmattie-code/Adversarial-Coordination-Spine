@@ -1,6 +1,6 @@
 # Adversarial Coordination Spine: Specification
 
-> **Status:** v1.0 · Drew Mattie · 2026-05-28
+> **Status:** v1.1 · Drew Mattie · 2026-06-02
 > **License:** [CC BY 4.0](LICENSE-CC-BY-4.0)
 
 This is the full technical specification for the Adversarial Coordination Spine pattern. The [README](README.md) is the elevator pitch; this document is the build reference.
@@ -75,7 +75,7 @@ Every role inside the spine has a distinct context window, a distinct system pro
 
 ---
 
-## 3. The 10 principles
+## 3. The 13 principles
 
 ### 3.1: Role-decomposed agents, not a single all-purpose agent
 
@@ -294,6 +294,48 @@ This is the same muscle as reading a stack trace. There is no shortcut.
 
 ---
 
+### 3.11: Name the interop standard, MCP for tools, A2A for agents
+
+**Problem.** Principle #7 treats handoffs as first-class primitives but describes them abstractly. "An explicit, structured handoff" leaves the wire protocol unspecified, and an unnamed protocol is not interoperable: two ACS systems built by different teams cannot hand work to each other if neither commits to a standard.
+
+**Pattern.** Name two layers explicitly. The Model Context Protocol (MCP) is the agent-to-tool layer: how an agent reaches a tool, a connector, or a data source. The Agent2Agent (A2A) protocol is the agent-to-agent layer: how one agent hands work to another. The clean framing is one line: **MCP governs agent-to-tool, A2A governs agent-to-agent.** This makes principle #7 concrete instead of abstract. A handoff is not "the other agent figures it out from context"; it is an A2A message with a named target, a typed payload, and a success condition.
+
+A2A is emerging, not yet universal. Keep a protocol-pluggable escape hatch: an ACS system can satisfy principle #7 over A2A, over a framework-native handoff primitive (OpenAI Agents SDK `handoff()`, LangGraph routing edges, an Anthropic file-system contract), or over a custom transport. A2A is the reference standard ACS rides and governs, not the only legal one.
+
+**Implementation.** Where your stack supports A2A, route agent-to-agent handoffs through it and route tool calls through MCP. Where it does not, document which transport stands in for A2A so the substitution is explicit. Either way, the agent-to-tool and agent-to-agent boundaries stay named and separate.
+
+**Anti-pattern.** Collapsing both layers into "the agent calls things." When agent-to-tool and agent-to-agent share one undifferentiated channel, you lose the ability to govern, observe, and audit the two boundaries independently. Convergence signal: MuleSoft Agent Fabric governs both MCP and A2A as distinct layers in one enterprise control plane.
+
+---
+
+### 3.12: Observability, you cannot coordinate what you cannot see
+
+**Problem.** The coordination-failure surface of a multi-agent system, deadlock, cascading failure, context poisoning, silent substitution, scope creep, is invisible from inside any single role. The Planner does not know the Evaluator is stuck. The Orchestrator does not know two specialists are deadlocked on a shared resource. Without a view of the whole network, these failures are undetectable until the run has already gone wrong.
+
+**Pattern.** A coordinated multi-agent system must expose a live, queryable view of the whole agent network: who is running, what they are handing off, where work is stuck. This is traces, metrics, and logs layered over the structured handoffs of principle #7. The handoffs are the events; observability is the live read of those events across every role at once. MuleSoft's Agent Visualizer ("see the whole agent network," a live map with metrics, logs, and traces) is the productized form.
+
+**Cross-reference to AGS (important).** Observability is the ACS-side *live view* of the same signal AGS governs as a *durable record*. One trace fabric, two consumers: observability (ACS, the real-time coordination view) feeds AGS's tamper-evident audit (the durable forensic record). They are not the same territory. ACS asks "what is happening right now and where is it stuck"; AGS asks "what happened, who did it, and can we prove it later." Note this seam so observability (ACS) and audit (AGS) do not appear to claim the same ground.
+
+**Implementation.** Emit OTel-compatible spans tagged by role and turn for every handoff. Bundle prompt management and eval primitives into the same trace store so the live view and the eval history share one schema. Langfuse and Pydantic Logfire are productized substrates for this; Logfire adds type-validated handoff payloads when the implementation leans Python-typed.
+
+**Anti-pattern.** Treating observability as a post-hoc add-on, bolted on after the coordination logic ships. A coordinated system that cannot be watched while it runs cannot be debugged while it runs; you are left reconstructing failures from aggregate metrics after the fact (the failure mode principle #10 already warns against, here raised to a network-level concern).
+
+---
+
+### 3.13: Heterogeneous executors, not just agents
+
+**Problem.** ACS as stated coordinates LLM agents. But a real production process rarely wants every step done by a probabilistic agent. Some steps are deterministic by nature (a data transform, a scripted API call, a robot moving a record between systems) and an LLM agent there is slower, costlier, and less reliable than code. Some steps require human judgment or accountability (an approval, a sign-off, a regulated decision) and no agent should own them. Forcing every executor to be an agent mis-assigns work to the wrong kind of executor.
+
+**Pattern.** A coordinated run's executors need not all be LLM agents. Deterministic automation (robots, code, scripted steps) and human tasks are first-class roles in the topology, assigned by stakes: deterministic execution where determinism is cheaper and safer, a human step where judgment or accountability is required, an LLM agent where neither of those fits. This sharpens principle #1 (role decomposition) and principle #7 (handoffs): a handoff target can be a robot, a human queue, or an agent, and the contract is the same in every case (named target, typed payload, success condition).
+
+The companion idea is an **explicit process model** (BPMN or an equivalent) as the deterministic coordination substrate that wires these heterogeneous executors together. The process model says, deterministically, which executor runs when, what gates the next step, and where a human task or a robot task sits in the flow. This reinforces the deterministic-over-probabilistic theme: the spine of the process is explicit and deterministic; the agents fill the steps that genuinely need probabilistic reasoning.
+
+**Implementation.** Model the run as a process with typed steps. Assign each step an executor kind (agent, deterministic automation, or human task) by stakes, not by default. Route handoffs to whichever executor owns the next step; the handoff contract does not change with the executor kind. Where you have a BPMN engine or equivalent workflow runtime, let it own the deterministic spine and call agents as steps.
+
+**Anti-pattern.** "Everything is an agent." Wrapping a deterministic transform or a human approval in an LLM agent adds cost, latency, and a new failure surface for no benefit. Convergence signal: UiPath Maestro coordinates AI agents, deterministic RPA robots, and humans as first-class participants in one BPMN process, with human-in-the-loop via Action Center; MuleSoft's Agent Script codifies deterministic multi-agent workflows over pure probabilistic behavior.
+
+---
+
 ## 4. SLAs and success metrics
 
 | Metric | Target | Rationale |
@@ -356,9 +398,11 @@ ACS is framework-agnostic. The pattern can be implemented in any of these stacks
 
 ACS is also compatible with, and built on top of, these underlying standards:
 
-- **Model Context Protocol (MCP):** Per-agent tool access in an ACS system goes through MCP servers
+- **Model Context Protocol (MCP):** The agent-to-tool layer. Per-agent tool access in an ACS system goes through MCP servers (principle #11)
+- **Agent2Agent (A2A):** The agent-to-agent layer. The named interop standard ACS rides and governs for handoffs (principle #11); protocol-pluggable where A2A is not yet available
 - **Progressive Discovery Spine (PDS):** When a single agent in an ACS system needs scoped tool discipline, PDS handles that layer
-- **OpenTelemetry:** Trace logs (principle #10) emit OTel-compatible traces
+- **OpenTelemetry:** Trace logs (principles #10 and #12) emit OTel-compatible traces
+- **BPMN or an equivalent process model:** The deterministic coordination substrate for heterogeneous executors (principle #13)
 
 ---
 
@@ -379,10 +423,44 @@ ACS is also compatible with, and built on top of, these underlying standards:
 - Letta, *Stateful Agents: Memory* ([docs.letta.com](https://docs.letta.com/guides/agents/memory/))
 - Affaan Mustafa, *ECC (Everything Claude Code): Subagents documentation* ([github.com/affaan-m/ECC](https://github.com/affaan-m/ECC))
 
+### Convergence sources (added in v1.1)
+
+These document independent implementations and worked examples that arrived at ACS's principles from the implementation altitude and from enterprise platforms.
+
+- **The 4-agent feature pipeline (Planner / Coder / Tester / Reviewer).** A widely-shared public worked example: four role-decomposed subagents with separate context windows, a read-only reviewer, and a shared handoff folder (`.pipeline/spec.md` -> `changes.md` -> `test-results.md` -> `review.md`): ACS principles #1, #4, and #7 in one concrete pattern.
+- **Multi-agent workflows field guide (Av1d, 2026).** A practitioner synthesis of multi-agent orchestration on Claude Code that independently codifies ACS's core claims: substrate-mediated communication (*"agents should not talk to each other directly; they write to a shared memory layer and read from it"*) as principles #4 and #7, six orchestration topologies including generator-verifier and adversarial debate as ACS's evaluator/judge separation, explicit per-agent output contracts, and a five-item production failure taxonomy (context poisoning, cascading failure, scope creep, silent substitution, coordination deadlock).
+- **MuleSoft Agent Fabric (Salesforce)** ([mulesoft.com](https://www.mulesoft.com/ai/agent-fabric)). Enterprise agent control plane: the Agent Broker routes and delegates work conditioned on request intent, policy, identity, and runtime state; Agent Script codifies multi-agent workflows deterministically over probabilistic behavior; governs agent-to-agent interaction via the A2A (Agent2Agent) protocol. Convergence source for principles #11 and #13.
+- **UiPath Maestro (agentic orchestration)** ([uipath.com](https://www.uipath.com/platform/agentic-automation/agentic-orchestration)). Orchestrates agents, robots, and people across processes modeled in BPMN, a deterministic process layer over agents, with human-in-the-loop via Action Center. Convergence source for principle #13 (heterogeneous executors).
+- **Microsoft, Agent Governance Toolkit** ([github.com/microsoft/agent-governance-toolkit](https://github.com/microsoft/agent-governance-toolkit)). MIT-licensed governance kernel: agent identity (SPIFFE/DID/mTLS), per-agent execution audit with commitment anchoring, agent marketplace with trust scoring. The protocol-layer answer to "which agent did this?"
+- **Claude-Mem** ([github.com/thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)). Open-source Claude Code memory system (Apache 2.0) using 5 lifecycle hooks to persist tool-usage observations and semantic summaries to SQLite and Chroma. Productized implementation of principle #4 from a single-agent persistence angle.
+- **e2b** ([github.com/e2b-dev/e2b](https://github.com/e2b-dev/e2b)). Firecracker-microVM OSS sandbox runtime for agent-generated code, with mTLS identity hooks. The canonical OSS substrate for safely enforcing ACS's planner-vs-executor boundary at execution time.
+- **Langfuse** ([github.com/langfuse/langfuse](https://github.com/langfuse/langfuse)). OTel-native trace fabric for LLM/agent systems with first-class span types for planner, executor, and judge roles. Substrate for principle #12 (observability).
+- **Inspect (UK AI Security Institute)** ([github.com/UKGovernmentBEIS/inspect_ai](https://github.com/UKGovernmentBEIS/inspect_ai)). Sovereign-grade LLM eval framework used by AISI and US AISI for frontier-model assessments. Institutional validation of ACS's evaluator-separation principle.
+- **Pydantic Logfire** ([github.com/pydantic/logfire](https://github.com/pydantic/logfire)). Pydantic-team OSS observability with first-class agent/LLM spans and Pydantic-validated trace schemas. The type-validated handoff payload substrate for principle #7, and another substrate for principle #12.
+
 ### Adjacent specifications
 
 - Model Context Protocol: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-- Progressive Discovery Spine: [github.com/drewmattie-code/Progressive-Discovery-Spine](https://github.com/drewmattie-code/Progressive-Discovery-Spine)
+- Agent2Agent (A2A): the emerging agent-to-agent interop standard ACS rides and governs (principle #11)
+
+### The Spine catalog
+
+ACS is one spec in a catalog of layered, vendor-neutral architectural patterns from SaaSquach AI Labs. Each spec owns one failure surface.
+
+| Spec | Owns | Status |
+|---|---|---|
+| **PDS** (Progressive Discovery Spine) | tool discovery | public ([repo](https://github.com/drewmattie-code/Progressive-Discovery-Spine)) |
+| **ACS** (Adversarial Coordination Spine) | multi-agent coordination | public (this spec) |
+| **ESF** (External Signal Fabric) | external-world signals | public |
+| **CRI** (Composite Risk Index) | composite risk scoring | private (patent-preservation) |
+| **AGS** (Agent Governance Spine) | deterministic governance, identity, audit | public |
+| **DCS** (Durable Context Spine) | durable state and memory across sessions and time | public |
+| **GDS** (Grounded Data Spine) | a canonical semantic model (text-to-metric) plus data-level entitlements | private (forthcoming) |
+| **ARS** (Agent Registry Spine) | the inventory substrate: one system of record for every agentic asset that discovery reads from and governance enforces against | private (forthcoming) |
+
+**Nine-way failure attribution:** bad customer/tool data -> PDS; bad world data -> ESF; bad reasoning -> ACS Planner; bad evaluation -> ACS Evaluator; bad scoring -> CRI; bad governance -> AGS; bad continuity -> DCS; bad grounding -> GDS; bad or missing registry -> ARS.
+
+**Composition with DCS.** ACS principle #4 (file-system state) owns the within-run concurrency axis: handoffs and shared state that survive context compaction inside one coordinated run. DCS owns the across-run temporal axis: state and memory that survive disconnected sessions over days and weeks, even for a single agent. ACS writes its handoff artifacts into the DCS store. Principle #4 does not claim the whole durable-state territory; it claims the slice that keeps one coordinated run coherent and hands long-horizon persistence to DCS.
 
 ---
 
@@ -392,6 +470,7 @@ This specification follows semantic versioning. Breaking changes to the conceptu
 
 - **v0.1-draft:** initial draft (2026-05-25). Internal review.
 - **v1.0:** first public release under CC BY 4.0 + MIT (2026-05-28). Includes ECC convergence citation (Affaan Mustafa, *Everything Claude Code*).
+- **v1.1:** (2026-06-02). Adds three principles: #11 (name the interop standard, MCP for tools and A2A for agents), #12 (observability, you cannot coordinate what you cannot see), and #13 (heterogeneous executors, not just agents, with an explicit process model). Adds convergence citations (the 4-agent feature pipeline, the Av1d multi-agent workflows guide, MuleSoft Agent Fabric, UiPath Maestro, Microsoft Agent Governance Toolkit, Claude-Mem, e2b, Langfuse, Inspect, Pydantic Logfire). Adds the eight-spec Spine catalog with nine-way failure attribution and the composition-with-DCS boundary (ACS owns within-run concurrency; DCS owns across-run temporal persistence).
 
 ---
 

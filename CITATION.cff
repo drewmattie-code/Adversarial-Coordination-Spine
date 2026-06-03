@@ -11,8 +11,8 @@ url: "https://github.com/drewmattie-code/Adversarial-Coordination-Spine"
 license:
   - CC-BY-4.0
   - MIT
-date-released: 2026-05-28
-version: "1.0"
+date-released: 2026-06-02
+version: "1.1"
 abstract: >
   ACS (Adversarial Coordination Spine) is an architectural pattern for the
   multi-agent layer that sits above the Progressive Discovery Spine (PDS) and
@@ -20,8 +20,8 @@ abstract: >
   of naive multi-agent deployment: sycophancy collapse from self-evaluation,
   cascading planning errors from over-specified up-front plans, serial collapse
   where models default to single-agent execution, and coherence drift across
-  context compaction in long-running sessions. The pattern is defined as ten
-  principles plus reference SLAs and a numbered build sequence. It is the
+  context compaction in long-running sessions. The pattern is defined as
+  thirteen principles plus reference SLAs and a numbered build sequence. It is the
   companion spec to PDS: PDS scopes the tool surface of one agent; ACS
   coordinates many agents against that surface.
 keywords:

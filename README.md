@@ -6,7 +6,7 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/spec-CC_BY_4.0-blue?style=flat-square)](LICENSE-CC-BY-4.0)
 [![License: MIT](https://img.shields.io/badge/code-MIT-green?style=flat-square)](LICENSE-MIT)
-[![Status: v1.0](https://img.shields.io/badge/status-v1.0-0F766E?style=flat-square)](SPEC.md)
+[![Status: v1.1](https://img.shields.io/badge/status-v1.1-0F766E?style=flat-square)](SPEC.md)
 [![Companion: PDS](https://img.shields.io/badge/companion-PDS-7C3AED?style=flat-square)](https://github.com/drewmattie-code/Progressive-Discovery-Spine)
 
 </div>
@@ -83,7 +83,7 @@ Every role has a distinct system prompt and a distinct context window. Every cro
 
 ## Where ACS fits in the stack
 
-The Model Context Protocol (MCP) is the protocol layer. The Progressive Discovery Spine (PDS) is the per-agent tool-discipline layer. ACS is the multi-agent coordination layer above both.
+The Model Context Protocol (MCP) is the agent-to-tool protocol layer. The Agent2Agent (A2A) protocol is the agent-to-agent interop layer. The Progressive Discovery Spine (PDS) is the per-agent tool-discipline layer. ACS is the multi-agent coordination layer above all of them: it rides MCP for agent-to-tool calls and A2A for agent-to-agent handoffs (principle #7), and stays protocol-pluggable where those standards are still settling.
 
 ```
 ┌────────────────────────────────────────┐
@@ -114,7 +114,7 @@ The Model Context Protocol (MCP) is the protocol layer. The Progressive Discover
 
 ACS can be used without PDS: a multi-agent system over a tiny tool surface doesn't need progressive discovery. PDS can be used without ACS: a single agent over an enterprise data estate doesn't need multi-agent coordination. They compose when both apply: each agent inside an ACS system uses PDS to scope its own tools.
 
-## The 10 principles
+## The 13 principles
 
 | # | Principle | The shift |
 |---|---|---|
@@ -124,10 +124,13 @@ ACS can be used without PDS: a multi-agent system over a tiny tool surface doesn
 | 04 | **File-system state, not context-window state** | Cross-role handoffs persist as artifacts on disk (feature-list.json, progress.md, contract.md). Survives compaction. |
 | 05 | **Vague plan, tactical detail negotiated by specialists** | Planner produces high-level sprints, not granular technical specs. Granular plans cascade errors over long horizons. |
 | 06 | **Orchestrator + specialist sub-agents (or supervisor + workers)** | One coordinator owns task decomposition; specialists own execution. Industry convergence: same pattern, many names. |
-| 07 | **Handoffs are first-class primitives** | Cross-agent state transfer happens via explicit handoff contracts with passed state, not via shared context. |
+| 07 | **Handoffs are first-class primitives** | Cross-agent state transfer happens via explicit handoff contracts with passed state, not via shared context. MCP for agent-to-tool, A2A for agent-to-agent. |
 | 08 | **Coordination rewards during training, not just outcome rewards** | Without instantiation and finish-rate rewards (Moonshot PARL), models collapse to single-agent serial execution. |
 | 09 | **Adaptive harness: fill the model's gaps, retire scaffolding as the model improves** | Sprint decomposition needed for Opus 4.5 was unnecessary for Opus 4.6. The harness should erode over model generations. |
 | 10 | **Read the traces, not just the metrics** | Quality comes from sitting with the system, reading what each role actually did, and finding where its judgment diverged from yours. |
+| 11 | **Name the interop standard: MCP for tools, A2A for agents** | Handoffs ride a named wire protocol. MCP governs agent-to-tool, A2A (Agent2Agent) governs agent-to-agent. Stay protocol-pluggable while these settle. |
+| 12 | **Observability: you cannot coordinate what you cannot see** | A coordinated system exposes a live, queryable view of the whole agent network: who is running, what they are handing off, where work is stuck. The live view of the same signal AGS keeps as durable audit. |
+| 13 | **Heterogeneous executors, not just agents** | A coordinated run's executors need not all be LLM agents. Deterministic automation (robots, code) and human tasks are first-class roles, assigned by stakes, with an explicit process model (BPMN or equivalent). |
 
 Full discussion of each principle, with problems, patterns, and implementation notes, lives in [SPEC.md](SPEC.md).
 
@@ -159,11 +162,31 @@ ACS is not a novel invention. It's a formalization of a pattern that production 
 
 **ECC (Everything Claude Code), harness-native operator system.** Anthropic-hackathon-winning open-source project (~182K stars, 28K forks as of 2026-05) that documents the role-decomposed-subagent pattern as canonical practice: *"Subagents are processes your orchestrator (main Claude) can delegate tasks to with limited scopes."* The project ships a reference subagent set (planner, architect, tdd-guide, code-reviewer, security-reviewer, build-error-resolver, e2e-runner, refactor-cleaner) with scoped tool permissions per subagent: independent industry confirmation of ACS principle #1 (role-decomposed agents) and principle #7 (handoffs as first-class primitives). [Source](https://github.com/affaan-m/ECC)
 
+**The 4-agent feature pipeline (Planner / Coder / Tester / Reviewer).** A widely-shared public worked example of ACS: four role-decomposed subagents with separate context windows, a read-only reviewer, and a shared handoff folder (`.pipeline/spec.md` -> `changes.md` -> `test-results.md` -> `review.md`): ACS principles #1, #4, and #7 in a single concrete pattern.
+
+**Multi-agent workflows field guide (Av1d, 2026).** A widely-shared practitioner synthesis of multi-agent orchestration on Claude Code that independently codifies ACS's core claims: substrate-mediated communication (*"agents should not talk to each other directly; they write to a shared memory layer and read from it"*) as ACS principles #4 and #7, six orchestration topologies including generator-verifier and adversarial debate as ACS's evaluator/judge separation, explicit per-agent output contracts, and a five-item production failure taxonomy (context poisoning, cascading failure, scope creep, silent substitution, coordination deadlock). Convergence from the implementation altitude, complementing ACS's vendor-neutral specification.
+
+**MuleSoft Agent Fabric (Salesforce).** Salesforce's enterprise agent control plane productizes ACS-style coordination: the Agent Broker routes and delegates work conditioned on request intent, policy, identity, and runtime state, and Agent Script codifies multi-agent workflows deterministically for consistent outputs over probabilistic behavior. Governs agent-to-agent interaction via the A2A (Agent2Agent) protocol. A major-vendor instance of ACS's coordination thesis. [Source](https://www.mulesoft.com/ai/agent-fabric)
+
+**UiPath Maestro (agentic orchestration).** Orchestrates agents, robots, and people across processes modeled in BPMN, a deterministic process layer over agents, with human-in-the-loop via Action Center. A second major-vendor instance of the ACS coordination-and-determinism thesis, and the clearest production example of heterogeneous executors (principle #13). [Source](https://www.uipath.com/platform/agentic-automation/agentic-orchestration)
+
+**Microsoft, Agent Governance Toolkit.** Microsoft's MIT-licensed governance kernel ships agent identity (SPIFFE/DID/mTLS), per-agent execution audit with commitment anchoring, and an agent marketplace with trust scoring as core primitives: the protocol-layer answer to ACS's "which agent did this?" problem. Microsoft's framing: identity per agent, not per session, because *"in a multi-agent system, five agents might share a single API key, when something goes wrong, 'an agent did it' is not an incident response."* [Source](https://github.com/microsoft/agent-governance-toolkit)
+
+**Claude-Mem, productized cross-session memory for single-agent contexts.** Open-source Claude Code memory system (~v6.5.0, Apache 2.0) using 5 lifecycle hooks to persist tool-usage observations and semantic summaries to SQLite (structured) and Chroma (vector search). Independent productized implementation of ACS principle #4 (file-system state, not context-window state), complementing Letta's multi-agent shared-memory primitive from a single-agent persistence angle. [Source](https://github.com/thedotmack/claude-mem)
+
+**e2b, OSS sandbox runtime for agent-generated code.** Firecracker-microVM-based execution environment with mTLS identity hooks, purpose-built for agent code execution. ACS's planner-vs-executor role boundary is only safely enforceable when the executor runs in a sandboxed environment; e2b is the canonical OSS substrate for that boundary. [Source](https://github.com/e2b-dev/e2b)
+
+**Langfuse, OSS observability for agent coordination.** OTel-native trace fabric for LLM/agent systems with first-class span types for planner, executor, and judge roles. ACS's structured handoffs (principle #7) are only auditable when traces capture the role boundary; Langfuse productizes this with prompt management and eval primitives bundled into the same trace store. Substrate for principle #12 (observability). [Source](https://github.com/langfuse/langfuse)
+
+**Inspect (UK AI Security Institute).** Sovereign-grade LLM eval framework, the framework AISI and US AISI use for frontier-model assessments. Productizes ACS's evaluator-separation principle with sovereign-grade institutional credibility; the existence of a UK government agency standardizing on judge-separated eval frameworks validates ACS's role decomposition. [Source](https://github.com/UKGovernmentBEIS/inspect_ai)
+
+**Pydantic Logfire, typed OTel observability for agent handoffs.** Pydantic-team OSS observability with first-class agent/LLM spans and Pydantic-validated trace schemas. The type-validated handoff payload is the substrate ACS principle #7 (handoffs as first-class primitives) implies; Logfire is the clearest productized version of that contract, and another substrate for principle #12 (observability). [Source](https://github.com/pydantic/logfire)
+
 ### What ACS contributes
 
 The sources above document INDIVIDUAL implementations and isolated principles. ACS contributes:
 
-1. A unified set of **10 principles** mapped to four documented failure modes
+1. A unified set of **13 principles** mapped to four documented failure modes
 2. **Target SLAs** for production multi-agent readiness
 3. An **8-step build sequence** from skeleton to reference deployment
 4. **Anti-patterns** to avoid
@@ -227,7 +250,7 @@ curl -fsSL https://raw.githubusercontent.com/drewmattie-code/Adversarial-Coordin
   -o ~/.claude/skills/acs/SKILL.md
 ```
 
-After install, the skill auto-activates whenever you ask Claude about multi-agent coordination, long-running agent harnesses, evaluator-generator patterns, or related multi-agent failure modes. It diagnoses which of the four documented failure modes you're hitting and recommends which of the 10 principles to apply.
+After install, the skill auto-activates whenever you ask Claude about multi-agent coordination, long-running agent harnesses, evaluator-generator patterns, or related multi-agent failure modes. It diagnoses which of the four documented failure modes you're hitting and recommends which of the 13 principles to apply.
 
 Works in Claude Code natively. The SKILL.md format is portable. Drop it into Cursor, Codex, or any agent that supports the convention.
 
@@ -259,6 +282,27 @@ See [LICENSE](LICENSE) for the summary.
 ## Companion specification
 
 ACS is the companion specification to the [Progressive Discovery Spine (PDS)](https://github.com/drewmattie-code/Progressive-Discovery-Spine). PDS scopes the tool surface of one agent. ACS coordinates many agents against that surface. The two can be used together or separately, but they were designed to compose.
+
+## The Spine catalog
+
+ACS is one spec in a catalog of layered, vendor-neutral architectural patterns from SaaSquach AI Labs. Each spec owns one failure surface; together they form an attribution dictionary that tells you which layer to blame when a multi-agent system misbehaves.
+
+| Spec | Owns | Status |
+|---|---|---|
+| **PDS** (Progressive Discovery Spine) | tool discovery | public |
+| **ACS** (Adversarial Coordination Spine) | multi-agent coordination | public |
+| **ESF** (External Signal Fabric) | external-world signals | public |
+| **CRI** (Composite Risk Index) | composite risk scoring | private (patent-preservation) |
+| **AGS** (Agent Governance Spine) | deterministic governance, identity, audit | public |
+| **DCS** (Durable Context Spine) | durable state and memory across sessions and time | public |
+| **GDS** (Grounded Data Spine) | a canonical semantic model (text-to-metric) plus data-level entitlements | private (forthcoming) |
+| **ARS** (Agent Registry Spine) | the inventory substrate: one system of record for every agentic asset that discovery reads from and governance enforces against | private (forthcoming) |
+
+**Nine-way failure attribution:** bad customer/tool data -> PDS; bad world data -> ESF; bad reasoning -> ACS Planner; bad evaluation -> ACS Evaluator; bad scoring -> CRI; bad governance -> AGS; bad continuity -> DCS; bad grounding -> GDS; bad or missing registry -> ARS.
+
+### Composition with DCS
+
+ACS principle #4 (file-system state) and DCS (Durable Context Spine) sit on adjacent axes and should not be confused. ACS owns the **within-run concurrency** axis: handoffs and shared state that survive context compaction inside one coordinated run. DCS owns the **across-run temporal** axis: state and memory that survive disconnected sessions over days and weeks, even for a single agent. ACS writes its handoff artifacts into the DCS store. Principle #4 does not claim the whole durable-state territory; it claims the slice that keeps a single coordinated run coherent, and hands the long-horizon persistence to DCS.
 
 ## Author
 
