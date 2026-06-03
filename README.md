@@ -300,7 +300,7 @@ ACS is one spec in a catalog of layered, vendor-neutral architectural patterns f
 | **AGS** (Agent Governance Spine) | deterministic governance, identity, audit | public |
 | **DCS** (Durable Context Spine) | durable state and memory across sessions and time | public |
 | **GDS** (Grounded Data Spine) | a canonical semantic model (text-to-metric) plus data-level entitlements | private (forthcoming) |
-| **ARS** (Agent Registry Spine) | the inventory substrate: one system of record for every agentic asset that discovery reads from and governance enforces against | private (forthcoming) |
+| **ARS** (Agent Registry Spine) | the system of record layer for every agentic asset that discovery reads from and governance enforces against | private (forthcoming) |
 | **SRS** (Sovereign Runtime Spine) | the execution substrate: the sovereign, first-party agent runtime that first-party agents run on (outside agents and tools plug into the Spine; first-party agents run on SRS) | private (forthcoming) |
 
 **Ten-way failure attribution:** bad customer/tool data -> PDS; bad world data -> ESF; bad reasoning -> ACS Planner; bad evaluation -> ACS Evaluator; bad scoring -> CRI; bad governance -> AGS; bad continuity -> DCS; bad grounding -> GDS; bad or missing registry -> ARS; bad or unbounded execution -> SRS.
