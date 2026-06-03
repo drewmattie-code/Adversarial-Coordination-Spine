@@ -459,8 +459,9 @@ ACS is one spec in a catalog of layered, vendor-neutral architectural patterns f
 | **DCS** (Durable Context Spine) | durable state and memory across sessions and time | public |
 | **GDS** (Grounded Data Spine) | a canonical semantic model (text-to-metric) plus data-level entitlements | private (forthcoming) |
 | **ARS** (Agent Registry Spine) | the inventory substrate: one system of record for every agentic asset that discovery reads from and governance enforces against | private (forthcoming) |
+| **SRS** (Sovereign Runtime Spine) | the execution substrate: the sovereign, first-party agent runtime that first-party agents run on (outside agents and tools plug into the Spine; first-party agents run on SRS) | private (forthcoming) |
 
-**Nine-way failure attribution:** bad customer/tool data -> PDS; bad world data -> ESF; bad reasoning -> ACS Planner; bad evaluation -> ACS Evaluator; bad scoring -> CRI; bad governance -> AGS; bad continuity -> DCS; bad grounding -> GDS; bad or missing registry -> ARS.
+**Ten-way failure attribution:** bad customer/tool data -> PDS; bad world data -> ESF; bad reasoning -> ACS Planner; bad evaluation -> ACS Evaluator; bad scoring -> CRI; bad governance -> AGS; bad continuity -> DCS; bad grounding -> GDS; bad or missing registry -> ARS; bad or unbounded execution -> SRS.
 
 **Composition with DCS.** ACS principle #4 (file-system state) owns the within-run concurrency axis: handoffs and shared state that survive context compaction inside one coordinated run. DCS owns the across-run temporal axis: state and memory that survive disconnected sessions over days and weeks, even for a single agent. ACS writes its handoff artifacts into the DCS store. Principle #4 does not claim the whole durable-state territory; it claims the slice that keeps one coordinated run coherent and hands long-horizon persistence to DCS.
 
@@ -472,7 +473,7 @@ This specification follows semantic versioning. Breaking changes to the conceptu
 
 - **v0.1-draft:** initial draft (2026-05-25). Internal review.
 - **v1.0:** first public release under CC BY 4.0 + MIT (2026-05-28). Includes ECC convergence citation (Affaan Mustafa, *Everything Claude Code*).
-- **v1.1:** (2026-06-02). Adds three principles: #11 (name the interop standard, MCP for tools and A2A for agents), #12 (observability, you cannot coordinate what you cannot see), and #13 (heterogeneous executors, not just agents, with an explicit process model). Adds convergence citations (the 4-agent feature pipeline, the Av1d multi-agent workflows guide, MuleSoft Agent Fabric, UiPath Maestro, Microsoft Agent Governance Toolkit, Claude-Mem, e2b, Langfuse, Inspect, Pydantic Logfire). Adds the eight-spec Spine catalog with nine-way failure attribution and the composition-with-DCS boundary (ACS owns within-run concurrency; DCS owns across-run temporal persistence).
+- **v1.1:** (2026-06-02). Adds three principles: #11 (name the interop standard, MCP for tools and A2A for agents), #12 (observability, you cannot coordinate what you cannot see), and #13 (heterogeneous executors, not just agents, with an explicit process model). Adds convergence citations (the 4-agent feature pipeline, the Av1d multi-agent workflows guide, MuleSoft Agent Fabric, UiPath Maestro, Microsoft Agent Governance Toolkit, Claude-Mem, e2b, Langfuse, Inspect, Pydantic Logfire). Adds the nine-spec Spine catalog with ten-way failure attribution and the composition-with-DCS boundary (ACS owns within-run concurrency; DCS owns across-run temporal persistence).
 
 ---
 
