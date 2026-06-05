@@ -265,6 +265,9 @@ The [`examples/`](examples/) directory has concrete artifacts:
 - [`role-prompts.md`](examples/role-prompts.md): three example system prompts (Planner / Generator / Evaluator)
 - [`negotiated-contract.md`](examples/negotiated-contract.md): what the Generator/Evaluator negotiation looks like on disk
 - [`evaluator-rubric.md`](examples/evaluator-rubric.md): sample 20-criteria rubric for a generic full-stack app
+- [`pipeline.py`](examples/pipeline.py): a runnable, dependency-free Planner / Generator / Evaluator pipeline. It writes typed handoffs to disk, has the Evaluator (a separate session and model) reject the first pass and accept the revision, and validates every handoff against the schema. Run it with `python3 examples/pipeline.py`.
+
+The formal handoff contract lives in [`schema/handoff.v1.json`](schema/handoff.v1.json) (principle #7, typed handoffs as first-class primitives).
 
 ## Citing this work
 

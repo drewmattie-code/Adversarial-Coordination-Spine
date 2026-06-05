@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/drewmattie-code/Adversarial-Coordination-Spine/schema/handoff.v1.json",
+  "title": "ACS Typed Handoff",
+  "description": "Typed handoff payload passed between ACS roles (Planner, Generator, Evaluator). Formalizes principle #7 (handoffs as first-class typed primitives, not free-form prose) and #4 (cross-role state lives on disk, not in a shared context window).",
+  "type": "object",
+  "required": ["handoff_id", "sprint_id", "timestamp", "from_role", "to_role", "kind", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "handoff_id": {"type": "string"},
+    "sprint_id": {"type": "string"},
+    "timestamp": {"type": "string"},
+    "from_role": {"type": "string", "enum": ["planner", "generator", "evaluator"]},
+    "to_role": {"type": "string", "enum": ["planner", "generator", "evaluator"]},
+    "kind": {
+      "type": "string",
+      "enum": ["plan", "submission", "verdict"],
+      "description": "plan = Planner sets the contract; submission = Generator hands an artifact; verdict = Evaluator accepts or rejects."
+    },
+    "artifact_ref": {
+      "type": "string",
+      "description": "Path to the artifact on disk. State on disk, never passed in a shared context window."
+    },
+    "contract": {
+      "type": "object",
+      "description": "The criteria the artifact is graded against. The Evaluator grades against this, not the upstream prose (principle #5).",
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "properties": {
+              "id": {"type": "string"},
+              "text": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["passed", "results"],
+      "properties": {
+        "passed": {"type": "boolean"},
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "passed"],
+            "properties": {
+              "id": {"type": "string"},
+              "passed": {"type": "boolean"},
+              "note": {"type": "string"}
+            }
+          }
+        },
+        "summary": {"type": "string"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Who produced this handoff. Distinct session and model per role is what makes the Evaluator structurally unable to rubber-stamp the Generator (principle #2).",
+      "required": ["session_id", "model"],
+      "properties": {
+        "session_id": {"type": "string"},
+        "model": {"type": "string"}
+      }
+    }
+  }
+}
