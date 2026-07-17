@@ -1,9 +1,39 @@
 # Adversarial Coordination Spine: Specification
 
-> **Status:** v1.1 · Drew Mattie · 2026-06-02
+> **Status:** v1.2 · Drew Mattie · 2026-07-17
 > **License:** [CC BY 4.0](LICENSE-CC-BY-4.0)
 
 This is the full technical specification for the Adversarial Coordination Spine pattern. The [README](README.md) is the elevator pitch; this document is the build reference.
+
+---
+
+## Conformance
+
+The key words MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY in this document are to be interpreted as described in BCP 14 ([RFC 2119](https://www.rfc-editor.org/rfc/rfc2119), [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174)) when, and only when, they appear in all capitals.
+
+This specification separates three tiers of guidance, and only the first confers conformance:
+
+1. **Required behaviour** — the numbered requirements below (ACS-R1 …). An implementation is ACS-conformant when it satisfies every MUST-level requirement.
+2. **Recommended implementation** — the patterns the principle discussions describe (SHOULD level). Departures are legitimate with documented rationale.
+3. **Illustrative technology** — named products and projects throughout this document (specific agent frameworks, orchestrators, and commercial platforms) are examples only. Deploying a named component does not by itself make a layer conformant, and no requirement below depends on any specific vendor.
+
+### Normative requirements
+
+| ID | Requirement |
+|---|---|
+| ACS-R1 | Production multi-agent work MUST decompose into distinct roles with separated contexts — at minimum a planner, one or more generators, and an evaluator. |
+| ACS-R2 | Acceptance MUST be decided by an evaluator structurally separated from the generator (separate context, session, and identity); self-evaluation MUST NOT be the acceptance gate. Evaluator effectiveness MUST be measured by detection rate on seeded defects and false-negative rate — not by rejection volume. |
+| ACS-R3 | Work MUST proceed against an explicit negotiated contract artifact agreed before execution begins. |
+| ACS-R4 | Cross-role state MUST persist in durable shared storage; context windows MUST NOT be the only carrier of coordination state. |
+| ACS-R5 | Tactical detail MUST be negotiated by the executing specialist rather than fully prescribed top-down. |
+| ACS-R6 | The orchestration topology MUST be explicit and named (orchestrator + specialists, or supervisor + workers). |
+| ACS-R7 | Handoffs MUST be first-class recorded artifacts, not implicit context transfers. |
+| ACS-R8 | If post-training is controlled, coordination behaviours SHOULD be rewarded during training, not only outcomes. |
+| ACS-R9 | Harness capabilities SHOULD be reviewed each model generation and retired when the model subsumes them. |
+| ACS-R10 | Every run MUST produce a reviewable trace, and traces SHOULD be the primary debugging surface. |
+| ACS-R11 | Tool interop SHOULD use MCP; agent-to-agent interop SHOULD use A2A. |
+| ACS-R12 | Coordination events MUST be observable: which role did what, when, under which contract version. |
+| ACS-R13 | Executors MAY be heterogeneous (agents, deterministic scripts, humans); the contract and evaluation surface MUST be uniform across executor types. |
 
 ---
 
@@ -106,7 +136,7 @@ The analogy from Anthropic's AI Engineer talk: it's easy for a human to critique
 **Implementation.**
 
 - Give the Evaluator a harsh system prompt with explicit examples of what "AI slop" looks like for your domain
-- Calibrate against reference artifacts (good ones and bad ones) until first-pass rejection rate is > 30%
+- Calibrate against a seeded-defect battery (reference artifacts with planted flaws, good ones and bad ones) until the Evaluator's detection rate is ≥ 90% with zero missed critical seeds — measure correctness and false negatives, not rejection volume
 - The Evaluator should be able to *use* the artifact, not just read it: Playwright on UIs, real test runs on code, live API calls on integrations
 - Score on multiple rubric dimensions (design, originality, craft, functionality) with weights tunable per domain
 
@@ -341,7 +371,8 @@ The companion idea is an **explicit process model** (BPMN or an equivalent) as t
 | Metric | Target | Rationale |
 |---|---|---|
 | Run length without human intervention | > 4 hours | The whole point of long-running coordination |
-| Adversarial-evaluator first-pass rejection rate | > 30% | Evaluator that rubber-stamps is not adversarial |
+| Seeded-defect detection rate (evaluator catches planted flaws) | ≥ 90% | Measures adversarial effectiveness by correctness, not rejection volume |
+| Missed critical seeded defects (false negatives) | 0 | A checker that misses planted critical flaws is not a checker |
 | Final-output rejection rate after negotiation completes | < 5% | Negotiated contracts should make rejections rare at end |
 | Cross-role state transferred via file-system (vs context) | > 80% | File-system is the persistence layer |
 | Compaction events without coherence drift | 100% | If compaction breaks the run, the harness is wrong |
@@ -360,7 +391,7 @@ ACS is built in the following sequence from skeleton to first reference deployme
 |---|---|---|
 | 1 | Three role prompts (Planner / Generator / Evaluator) · separate context windows · single shared filesystem workspace | Skeleton must enforce role separation from day one |
 | 2 | Negotiated-contract protocol: markdown files on disk, Generator proposes, Evaluator counters, both agree before code | The contract is the load-bearing primitive |
-| 3 | Adversarial-evaluator tuning: few-shot examples calibrating Evaluator harshness; tune until first-pass rejection rate > 30% | Evaluator that rubber-stamps is not adversarial |
+| 3 | Adversarial-evaluator tuning: few-shot examples calibrating the Evaluator; calibrate against a seeded-defect battery until detection rate ≥ 90% | Evaluator that rubber-stamps is not adversarial |
 | 4 | File-system artifact convention: feature-list.json, progress.md, contract.md, critique-log.md, debug.log, standardize names + shapes | Convention beats configuration; future runs are debuggable |
 | 5 | Trace-reading workflow: every run produces a transcript; sit with traces and tune prompts before adding more roles | Primary debugging surface |
 | 6 | Second domain (e.g. extend coding harness to research synthesis) | Proves the pattern transfers across artifact types |
@@ -474,6 +505,7 @@ This specification follows semantic versioning. Breaking changes to the conceptu
 - **v0.1-draft:** initial draft (2026-05-25). Internal review.
 - **v1.0:** first public release under CC BY 4.0 + MIT (2026-05-28). Includes ECC convergence citation (Affaan Mustafa, *Everything Claude Code*).
 - **v1.1:** (2026-06-02). Adds three principles: #11 (name the interop standard, MCP for tools and A2A for agents), #12 (observability, you cannot coordinate what you cannot see), and #13 (heterogeneous executors, not just agents, with an explicit process model). Adds convergence citations (the 4-agent feature pipeline, the Av1d multi-agent workflows guide, MuleSoft Agent Fabric, UiPath Maestro, Microsoft Agent Governance Toolkit, Claude-Mem, e2b, Langfuse, Inspect, Pydantic Logfire). Adds the nine-spec Spine catalog with ten-way failure attribution and the composition-with-DCS boundary (ACS owns within-run concurrency; DCS owns across-run temporal persistence).
+- **v1.2:** (2026-07-17). Adds the Conformance section — BCP 14 keywords, the required / recommended / illustrative three-tier separation, and numbered normative requirements ACS-R1–R13. Replaces the evaluator calibration metric: “first-pass rejection rate > 30%” rewarded rejection volume for its own sake (a well-constrained, mature generator can legitimately have a low rejection rate); the normative metric is now seeded-defect detection rate ≥ 90% with zero missed critical seeds, measured against a maintained defect battery. Prompted in part by an external CIO architecture review (2026-07-17). No changes to the thirteen principles.
 
 ---
 

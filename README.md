@@ -6,7 +6,7 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/spec-CC_BY_4.0-blue?style=flat-square)](LICENSE-CC-BY-4.0)
 [![License: MIT](https://img.shields.io/badge/code-MIT-green?style=flat-square)](LICENSE-MIT)
-[![Status: v1.1](https://img.shields.io/badge/status-v1.1-0F766E?style=flat-square)](SPEC.md)
+[![Status: v1.2](https://img.shields.io/badge/status-v1.2-0F766E?style=flat-square)](SPEC.md)
 [![spec checks](https://github.com/drewmattie-code/Adversarial-Coordination-Spine/actions/workflows/spec-checks.yml/badge.svg)](https://github.com/drewmattie-code/Adversarial-Coordination-Spine/actions/workflows/spec-checks.yml)
 [![Companion: PDS](https://img.shields.io/badge/companion-PDS-7C3AED?style=flat-square)](https://github.com/drewmattie-code/Progressive-Discovery-Spine)
 
@@ -205,7 +205,8 @@ If your team is independently converging on this pattern (as Anthropic, Moonshot
 | Metric | Target | Why it matters |
 |---|---|---|
 | Run length without human intervention | > 4 hours | The whole point of long-running coordination |
-| Adversarial-evaluator rejection rate on first generator pass | > 30% | Evaluator that rubber-stamps is not adversarial |
+| Seeded-defect detection rate (evaluator catches planted flaws) | ≥ 90% | Measures adversarial effectiveness by correctness, not rejection volume |
+| Missed critical seeded defects (false negatives) | 0 | A checker that misses planted critical flaws is not a checker |
 | Final-output rejection rate after negotiation completes | < 5% | Negotiated contracts should make rejections rare at end |
 | Cross-role state transferred via file-system (vs context) | > 80% | File-system is the persistence layer |
 | Compaction events without coherence drift | 100% | If compaction breaks the run, the harness is wrong |
@@ -221,7 +222,7 @@ ACS is built in sequence: skeleton through to first production reference deploym
 |---|---|
 | 1 | Three role prompts (Planner / Generator / Evaluator) · separate context windows · single shared filesystem workspace |
 | 2 | Negotiated-contract protocol: markdown files on disk, Generator proposes, Evaluator counters, both agree before code |
-| 3 | Adversarial-evaluator tuning: few-shot examples calibrating the Evaluator's harshness; tune until first-pass rejection rate > 30% |
+| 3 | Adversarial-evaluator tuning: few-shot examples calibrating the Evaluator; calibrate against a seeded-defect battery until detection rate ≥ 90% (rejection volume is not the target — a well-constrained generator legitimately has a low rejection rate) |
 | 4 | File-system artifact convention: feature-list.json, progress.md, contract.md, debug.log, standardize names and shapes |
 | 5 | Trace-reading workflow: every run produces a transcript; sit with traces and tune prompts before adding more roles |
 | 6 | Second domain (e.g. extend coding harness to research synthesis): prove the pattern transfers |
