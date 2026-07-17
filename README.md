@@ -7,6 +7,7 @@
 [![License: CC BY 4.0](https://img.shields.io/badge/spec-CC_BY_4.0-blue?style=flat-square)](LICENSE-CC-BY-4.0)
 [![License: MIT](https://img.shields.io/badge/code-MIT-green?style=flat-square)](LICENSE-MIT)
 [![Status: v1.1](https://img.shields.io/badge/status-v1.1-0F766E?style=flat-square)](SPEC.md)
+[![spec checks](https://github.com/drewmattie-code/Adversarial-Coordination-Spine/actions/workflows/spec-checks.yml/badge.svg)](https://github.com/drewmattie-code/Adversarial-Coordination-Spine/actions/workflows/spec-checks.yml)
 [![Companion: PDS](https://img.shields.io/badge/companion-PDS-7C3AED?style=flat-square)](https://github.com/drewmattie-code/Progressive-Discovery-Spine)
 
 </div>
@@ -293,6 +294,8 @@ ACS is the companion specification to the [Progressive Discovery Spine (PDS)](ht
 ## The Spine catalog
 
 ACS is one spec in a catalog of layered, vendor-neutral architectural patterns from SaaSquach AI Labs. Each spec owns one failure surface; together they form an attribution dictionary that tells you which layer to blame when a multi-agent system misbehaves.
+
+**The two tiers, and the two doors.** The nine layers group into two tiers: a **foundation tier** (DCS · GDS · ARS · SRS — the substrates: continuity, grounding, the system of record, execution) and a **capability tier** (PDS · ACS · ESF · CRI · AGS — the capabilities: discovery, coordination, world signals, scoring, governance). And there are exactly two ways anything reaches an agent estate; the catalog governs both. **Door 1: outside applications plug INTO the Spine** — any third-party agent, tool, or AI application connects through governed boundaries: discovered through one curated surface (PDS), every action policy-gated and audited (AGS), the data grounded and entitlement-scoped (GDS), tracked in one system of record (ARS). **Door 2: first-party agents run ON the Spine** — on the sovereign runtime (SRS) that composes the whole catalog, identity-bound, isolated, and bounded by construction. The rendered map lives at [saasquach.ai/spine](https://saasquach.ai/spine).
 
 | Spec | Owns | Status |
 |---|---|---|
