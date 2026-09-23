@@ -11,7 +11,7 @@ If you have built a multi-agent system that implements ACS (or pieces of it) in 
 Template: open an issue with title `[Implementation] <one-line summary>` and include:
 
 - Stack (model family, agent framework, MCP / PDS layer, harness shape)
-- Which of the 10 principles you implemented and which you skipped, and why
+- Which of the 13 principles you implemented and which you skipped, and why
 - What broke and how you fixed it
 - What SLAs you measured against the targets in [SPEC.md](SPEC.md#4-slas-and-success-metrics)
 - Particularly valued: failure-mode reports, i.e. which of the four named failure modes did you hit, and what was the fix?
